@@ -16,10 +16,15 @@ class _TopPageState extends State<TopPage> {
         name: '田中',
         uid: 'abc',
         imagePath:
-            'https://assets.st-note.com/production/uploads/images/58075596/profile_7d12166cbb91dd3ff25bbed3898bdd76.png?width=2000&height=2000&fit=bounds&format=jpg&quality=85',
-        lastMessage: 'こんにちは'),
-    User(name: '佐藤', uid: 'def', lastMessage: 'ありがとう'),
-    User(name: '佐藤', uid: 'def', lastMessage: 'ありがとう'),
+            'https://assets.st-note.com/production/uploads/images/58075596/profile_7d12166cbb91dd3ff25bbed3898bdd76.png?width=2000&height=2000&fit=bounds&format=jpg&quality=85'),
+    User(
+      name: '佐藤',
+      uid: 'def',
+    ),
+    User(
+      name: '佐藤',
+      uid: 'def',
+    ),
   ];
 
   @override
@@ -72,7 +77,7 @@ class _TopPageState extends State<TopPage> {
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          userList[index].lastMessage,
+                          'こんにちは',
                           style: const TextStyle(color: Colors.grey),
                         ),
                       ],
