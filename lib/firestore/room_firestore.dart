@@ -1,5 +1,6 @@
 import 'package:chat_app/firestore/user_firestore.dart';
 import 'package:chat_app/model/talk_room.dart';
+import 'package:chat_app/model/user.dart';
 import 'package:chat_app/utils/shared_prefs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //ここは個人トークルームなので、「warikan_app」には、必要のないdart.fileかもしれない
@@ -26,16 +27,35 @@ class RoomFirestore {
     }
   }
 
-  static Future<void> fetchJoinedRoom() async {
-    try{
+  static Future<void> fetchJoinedRooms() async {
+    try {
       String myUid = SharedPrefs.fetchUid()!;
-      final snapshot = await _roomCollection.where('joined_user_ids ',arrayContains: myUid ).get();
-      List<TalkRoom> talkRooms=[];
-      for(var doc in snapshot. docs){
-        final talkRoom = TalkRoom(roomId: doc.id, talkUser: talkUser)
+      //print(myUid);
+      final snapshot = await _roomCollection
+          .where('joined_user_ids ', arrayContains: myUid)
+          .get();
+      List<TalkRoom> talkRooms = [];
+      for (var doc in snapshot.docs) {
+        List<dynamic> userIds = doc.data()['joined_user_ids'];
+        //print(userIds);
+        late String talkUserUid;
+        for (var id in userIds) {
+          if (id == myUid) continue;
+          talkUserUid = id;
+        }
+        //print(talkUserUid);
+        User? talkUser = await UserFirestore.fetchProfile(talkUserUid);
+        //print(talkUser);
+        if (talkUser == null) return;
+        final talkRoom = TalkRoom(
+            roomId: doc.id,
+            talkUser: talkUser,
+            lastMessage: doc.data()['last_message']);
+        talkRooms.add(talkRoom);
       }
-    }catch(e){
-      
+      print(talkRooms.length);
+    } catch (e) {
+      print('参加しているルームの取得失敗=====$e');
     }
   }
 }

@@ -41,13 +41,12 @@ class UserFirestore {
     }
   }
 
-  static Future<User?> fetchMyProfile() async {
+  static Future<User?> fetchProfile(String uid) async {
     try {
-      String uid = SharedPrefs.fetchUid()!;
-      final myProfile = await _userCollection.doc(uid).get();
+      final snapshot = await _userCollection.doc(uid).get();
       User user = User(
-          name: myProfile.data()!['name'],
-          imagePath: myProfile.data()!['image_path'],
+          name: snapshot.data()!['name'],
+          imagePath: snapshot.data()!['image_path'],
           uid: uid);
       return user;
     } catch (e) {
