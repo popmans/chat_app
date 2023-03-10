@@ -70,4 +70,19 @@ class RoomFirestore {
         .orderBy('send_time', descending: true)
         .snapshots();
   }
+
+  static Future<void> sendMessage(
+      {required String roomId, required String message}) async {
+    try {
+      final messageCollection =
+          _roomCollection.doc(roomId).collection('message');
+      await messageCollection.add({
+        'message': message,
+        'sender_Id': SharedPrefs.fetchUid(),
+        'send_time': Timestamp.now()
+      });
+    } catch (e) {
+      print('メッセージの送信失敗=====$e');
+    }
+  }
 }
