@@ -62,4 +62,12 @@ class RoomFirestore {
       return null;
     }
   }
+
+  static Stream<QuerySnapshot> fetchMessageSnapahot(String roomId) {
+    return _roomCollection
+        .doc(roomId)
+        .collection('message')
+        .orderBy('send_time', descending: true)
+        .snapshots();
+  }
 }
