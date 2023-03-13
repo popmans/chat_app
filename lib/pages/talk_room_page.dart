@@ -42,9 +42,11 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                           final doc = snapshot.data!.docs[index];
                           final Map<String, dynamic> data =
                               doc.data() as Map<String, dynamic>;
+                          print("Uid==${SharedPrefs.fetchUid()}");
+                          print("sender_ID==${data['sender_Id']}");
                           final Message message = Message(
                               message: data['message'],
-                              isMe: SharedPrefs.fetchUid() == data['sender_id'],
+                              isMe: SharedPrefs.fetchUid() == data['sender_Id'],
                               sendTime: data['send_time']);
                           return Padding(
                             padding: EdgeInsets.only(
