@@ -22,7 +22,9 @@ class RoomFirestore {
         if (doc.id == myUid) return;
         await _roomCollection.add({
           'joined_user_ids': [doc.id, myUid],
-          'created_time': Timestamp.now()
+          'created_time': Timestamp.now(),
+          'room_name': '未設定',
+          'password': '1234',
         });
       });
     } catch (e) {

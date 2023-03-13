@@ -2,6 +2,7 @@ import 'package:chat_app/firestore/room_firestore.dart';
 import 'package:chat_app/model/talk_room.dart';
 import 'package:chat_app/pages/setting_profile_page.dart';
 import 'package:chat_app/pages/talk_room_page.dart';
+import 'package:chat_app/utils/shared_prefs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +27,12 @@ class _TopPageState extends State<TopPage> {
                     MaterialPageRoute(
                         builder: (context) => const SettingProfilePage()));
               },
-              icon: const Icon(Icons.settings))
+              icon: const Icon(Icons.settings)),
+          IconButton(
+              onPressed: () async {
+                await RoomFirestore.createRoom(SharedPrefs.fetchUid()!);
+              },
+              icon: const Icon(Icons.plus_one)),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
