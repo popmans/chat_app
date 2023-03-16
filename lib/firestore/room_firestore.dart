@@ -36,7 +36,6 @@ class RoomFirestore {
       QuerySnapshot snapshot) async {
     try {
       String myUid = SharedPrefs.fetchUid()!;
-      print(myUid);
       List<TalkRoom> talkRooms = [];
       for (var doc in snapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;

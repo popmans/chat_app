@@ -16,11 +16,26 @@ dependencies:
   firebase_core: ^2.7.0
   cloud_firestore: ^4.4.3
   shared_preferences: ^2.0.18
+  flutter_native_splash: ^2.2.19
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.12.0
   flutter_lints: ^2.0.0
+
+  #  追加
+flutter_icons:
+    android: true
+    ios: true
+    image_path: "assets/images/app_icon.png"
+
+
+
+flutter_native_splash:
+  image: "assets/images/app_icon.png"
+  color: "FFFFFF"
+
 
 flutter:
   uses-material-design: true
@@ -28,4 +43,5 @@ flutter:
   assets:
     - assets/images/create_image.png
     - assets/images/join_image.png
+    - assets/images/app_icon.png
 

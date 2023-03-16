@@ -1,4 +1,5 @@
 import 'package:chat_app/firestore/room_firestore.dart';
+import 'package:chat_app/pages/edit_group_page.dart';
 import 'package:chat_app/pages/setting_profile_page.dart';
 import 'package:chat_app/pages/talk_room_page.dart';
 import 'package:chat_app/utils/shared_prefs.dart';
@@ -135,7 +136,15 @@ class _TopPageState extends State<TopPage> {
                                             MainAxisAlignment.spaceAround,
                                         children: [
                                           GestureDetector(
-                                            onTap: () {},
+                                            onTap: () {
+                                              // ルーム作成処理
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        EditGroupPage()),
+                                              );
+                                            },
                                             child: Container(
                                               padding: const EdgeInsets.only(
                                                   top: 20.0,
@@ -169,7 +178,9 @@ class _TopPageState extends State<TopPage> {
                                             ),
                                           ),
                                           GestureDetector(
-                                            onTap: () {},
+                                            onTap: () {
+                                              // ルーム参加処理
+                                            },
                                             child: Container(
                                               padding: const EdgeInsets.only(
                                                   top: 25.0,

@@ -74,7 +74,7 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10, vertical: 6),
                                     child: Text(message.message)),
-                                Text(intl.DateFormat('HH:mm')
+                                Text(intl.DateFormat('y:HH:mm')
                                     .format(message.sendTime.toDate()))
                               ],
                             ),

@@ -1,4 +1,3 @@
-import 'package:chat_app/firestore/room_firestore.dart';
 import 'package:chat_app/model/user.dart';
 import 'package:chat_app/utils/shared_prefs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,12 +7,10 @@ class UserFirestore {
       FirebaseFirestore.instance;
   static final _userCollection = _firebaseFirestoreInstance.collection('user');
 
-  static Future<String?> insertNewAccont() async {
+  static Future<String?> insertNewAccount() async {
     try {
       final newDoc = await _userCollection.add({
-        'name': '名無し',
-        'image_path':
-            'https://assets.st-note.com/production/uploads/images/58075596/profile_7d12166cbb91dd3ff25bbed3898bdd76.png?width=2000&height=2000&fit=bounds&format=jpg&quality=85 '
+        'joined_groups': [],
       });
       print('アカウント作成完了');
       return newDoc.id;
@@ -24,9 +21,9 @@ class UserFirestore {
   }
 
   static Future<void> createUser() async {
-    final myUid = await UserFirestore.insertNewAccont();
+    final myUid = await UserFirestore.insertNewAccount();
     if (myUid != null) {
-      await RoomFirestore.createRoom(myUid);
+      // await RoomFirestore.createRoom(myUid);
       await SharedPrefs.setUid(myUid);
     }
   }
