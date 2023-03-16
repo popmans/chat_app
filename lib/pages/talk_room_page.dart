@@ -21,9 +21,7 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlueAccent,
-      appBar: AppBar(
-        title: Text(widget.talkRoom.talkUser.name),
-      ),
+      appBar: AppBar(),
       body: Stack(
         children: [
           StreamBuilder<QuerySnapshot>(
