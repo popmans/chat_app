@@ -9,9 +9,8 @@ class UserFirestore {
 
   static Future<String?> insertNewAccount() async {
     try {
-      final newDoc = await _userCollection.add({
-        'joined_groups': [],
-      });
+      final newDoc =
+          await _userCollection.add({'joined_groups': [], 'name': ''});
       print('アカウント作成完了');
       return newDoc.id;
     } catch (e) {
@@ -41,11 +40,17 @@ class UserFirestore {
   static Future<User?> fetchProfile(String uid) async {
     try {
       final snapshot = await _userCollection.doc(uid).get();
-      User user = User(
-          name: snapshot.data()!['name'],
-          imagePath: snapshot.data()!['image_path'],
-          uid: uid);
+      User user = User(name: snapshot.data()!['name'], uid: uid);
       return user;
+    } catch (e) {
+      print('自分のユーザ情報の取得失敗-----$e');
+      return null;
+    }
+  }
+
+  static Future<void> updateUserName(String uid, String name) async {
+    try {
+      await _userCollection.doc(uid).update({'name': name});
     } catch (e) {
       print('自分のユーザ情報の取得失敗-----$e');
       return null;

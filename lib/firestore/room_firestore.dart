@@ -64,6 +64,25 @@ class RoomFirestore {
     }
   }
 
+  static Future<void> checkJoinedRooms(
+      String myUid, String groupName, int password) async {
+    try {
+      final document = await _roomCollection
+          .where('room_name', isEqualTo: groupName)
+          .where('password', isEqualTo: password)
+          .get();
+      print(document.docs.length);
+      List<String> list =
+          document.docs.first['joined_user_ids'].cast<String>() as List<String>;
+      list.add(myUid);
+      await _roomCollection
+          .doc(document.docs.first.id)
+          .update({'joined_user_ids': list});
+    } catch (e) {
+      print('$e');
+    }
+  }
+
   static Stream<QuerySnapshot> fetchMessageSnapahot(String roomId) {
     return _roomCollection
         .doc(roomId)

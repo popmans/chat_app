@@ -1,7 +1,9 @@
 import 'package:chat_app/firestore/room_firestore.dart';
+import 'package:chat_app/firestore/user_firestore.dart';
 import 'package:chat_app/pages/edit_group_page.dart';
 import 'package:chat_app/pages/setting_profile_page.dart';
 import 'package:chat_app/pages/talk_room_page.dart';
+import 'package:chat_app/utils/shared_prefs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +17,53 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) {
+          TextEditingController userNameController = TextEditingController();
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: Text("ユーザー名を入力してください"),
+            content: TextField(
+              controller: userNameController,
+              enabled: true,
+              // 入力数
+              maxLength: 10,
+              style: TextStyle(color: Colors.black),
+              obscureText: false,
+              maxLines: 1,
+              decoration: const InputDecoration(
+                hintText: 'グループ名を入力してください',
+                labelText: 'グループ名',
+              ),
+            ),
+            actions: [
+              OutlinedButton(
+                child: Text("決定"),
+                onPressed: () async {
+                  if (userNameController.text != '') {
+                    String? uid = SharedPrefs.fetchUid();
+                    if (uid != null) {
+                      await UserFirestore.updateUserName(
+                          uid, userNameController.text);
+                    }
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -147,6 +196,94 @@ class _TopPageState extends State<TopPage> {
                                           GestureDetector(
                                             onTap: () {
                                               // ルーム参加処理
+                                              showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (_) {
+                                                  TextEditingController
+                                                      groupNameController =
+                                                      TextEditingController();
+                                                  TextEditingController
+                                                      passwordNameController =
+                                                      TextEditingController();
+
+                                                  return AlertDialog(
+                                                    shape: const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    10.0))),
+                                                    title: Text(
+                                                        "グループ名とパスワードを入力してください"),
+                                                    content: Column(
+                                                      children: [
+                                                        TextField(
+                                                          controller:
+                                                              groupNameController,
+                                                          enabled: true,
+                                                          // 入力数
+                                                          maxLength: 10,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black),
+                                                          obscureText: false,
+                                                          maxLines: 1,
+                                                          decoration:
+                                                              const InputDecoration(
+                                                            hintText:
+                                                                'グループ名を入力してください',
+                                                            labelText: 'グループ名',
+                                                          ),
+                                                        ),
+                                                        TextField(
+                                                          controller:
+                                                              passwordNameController,
+                                                          enabled: true,
+                                                          // 入力数
+                                                          maxLength: 10,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black),
+                                                          obscureText: false,
+                                                          maxLines: 1,
+                                                          decoration:
+                                                              const InputDecoration(
+                                                            hintText:
+                                                                'パスワードを入力してください',
+                                                            labelText: 'パスワード',
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    actions: [
+                                                      OutlinedButton(
+                                                        child: Text("キャンセル"),
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                context),
+                                                      ),
+                                                      OutlinedButton(
+                                                        child: Text("決定"),
+                                                        onPressed: () async {
+                                                          String? uid =
+                                                              SharedPrefs
+                                                                  .fetchUid();
+                                                          await RoomFirestore
+                                                              .checkJoinedRooms(
+                                                                  uid!,
+                                                                  groupNameController
+                                                                      .text,
+                                                                  int.parse(
+                                                                      passwordNameController
+                                                                          .text));
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
                                             },
                                             child: Container(
                                               padding: const EdgeInsets.only(
