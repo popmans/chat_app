@@ -14,4 +14,12 @@ class SharedPrefs {
   static String? fetchUid() {
     return _preferences!.getString('uid');
   }
+
+  static Future<void> setDoneOpen() async {
+    await _preferences!.setBool('doneOpen', true);
+  }
+
+  static bool fetchDoneOpen() {
+    return _preferences!.getBool('doneOpen') ?? false;
+  }
 }

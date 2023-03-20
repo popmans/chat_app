@@ -91,18 +91,28 @@ class RoomFirestore {
         .snapshots();
   }
 
-  static Future<void> sendMessage(
-      {required String roomId, required String message}) async {
+  static Future<void> sendMessage({
+    required String roomId,
+    required String who,
+    required String where,
+    required int howMuch,
+    required List<String> targets,
+  }) async {
     try {
       final messageCollection =
           _roomCollection.doc(roomId).collection('message');
       await messageCollection.add({
-        'message': message,
+        'who': who,
+        'where': where,
+        'how_much': howMuch,
+        'targets': targets,
         'sender_Id': SharedPrefs.fetchUid(),
         'send_time': Timestamp.now()
       });
 
-      await _roomCollection.doc(roomId).update({'last_message': message});
+      await _roomCollection
+          .doc(roomId)
+          .update({'last_message': '$whoが$whereで$howMuch払った。'});
     } catch (e) {
       print('メッセージの送信失敗=====$e');
     }

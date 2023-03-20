@@ -21,46 +21,49 @@ class _TopPageState extends State<TopPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) {
-          TextEditingController userNameController = TextEditingController();
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-            title: Text("ユーザー名を入力してください"),
-            content: TextField(
-              controller: userNameController,
-              enabled: true,
-              // 入力数
-              maxLength: 10,
-              style: TextStyle(color: Colors.black),
-              obscureText: false,
-              maxLines: 1,
-              decoration: const InputDecoration(
-                hintText: 'グループ名を入力してください',
-                labelText: 'グループ名',
+      if (SharedPrefs.fetchDoneOpen()) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) {
+            TextEditingController userNameController = TextEditingController();
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              title: Text("ユーザー名を入力してください"),
+              content: TextField(
+                controller: userNameController,
+                enabled: true,
+                // 入力数
+                maxLength: 10,
+                style: TextStyle(color: Colors.black),
+                obscureText: false,
+                maxLines: 1,
+                decoration: const InputDecoration(
+                  hintText: 'グループ名を入力してください',
+                  labelText: 'グループ名',
+                ),
               ),
-            ),
-            actions: [
-              OutlinedButton(
-                child: Text("決定"),
-                onPressed: () async {
-                  if (userNameController.text != '') {
-                    String? uid = SharedPrefs.fetchUid();
-                    if (uid != null) {
-                      await UserFirestore.updateUserName(
-                          uid, userNameController.text);
+              actions: [
+                OutlinedButton(
+                  child: Text("決定"),
+                  onPressed: () async {
+                    if (userNameController.text != '') {
+                      String? uid = SharedPrefs.fetchUid();
+                      if (uid != null) {
+                        await UserFirestore.updateUserName(
+                            uid, userNameController.text);
+                      }
+                      SharedPrefs.setDoneOpen();
+                      Navigator.pop(context);
                     }
-                    Navigator.pop(context);
-                  }
-                },
-              ),
-            ],
-          );
-        },
-      );
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     });
   }
 
