@@ -42,7 +42,16 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
     return Scaffold(
       backgroundColor: Colors.lightBlueAccent,
       appBar: AppBar(
+        title: Center(
+            child: Padding(
+          padding: const EdgeInsets.only(left: 40.0),
+          child: Text(widget.talkRoom.groupName),
+        )),
         actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.settings),
+          ),
           IconButton(
               onPressed: () async {
                 List<Map<String, double>> warikan = [];
