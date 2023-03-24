@@ -1,7 +1,11 @@
 import 'dart:async';
 
+import 'package:chat_app/const/icon_image_const.dart';
 import 'package:chat_app/firestore/room_firestore.dart';
+import 'package:chat_app/firestore/user_firestore.dart';
 import 'package:chat_app/model/talk_room.dart';
+import 'package:chat_app/model/user.dart';
+import 'package:chat_app/pages/edit_group_page.dart';
 import 'package:chat_app/utils/shared_prefs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +27,10 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
   late String isSelectedPerson;
   final TextEditingController whereController = TextEditingController();
   final TextEditingController moneyController = TextEditingController();
+  String? groupName;
+  List<String>? _members;
+  Map<String, String> mapUserName = {};
+  List<String> whoList = [];
   var focusNode = FocusNode();
   List<QueryDocumentSnapshot<Object?>>? calculationDocs;
   var controller = StreamController<List<QueryDocumentSnapshot<Object?>>>();
@@ -30,15 +38,32 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
   @override
   void initState() {
     super.initState();
-    isSelectedPerson = widget.talkRoom.members.first;
-    controller.stream.listen((data) {
+    _members = [for (var member in widget.talkRoom.members) member];
+    isSelectedPerson = _members!.first;
+    controller.stream.listen((data) async {
       calculationDocs = data;
+      setState(() {});
+      for (var doc in calculationDocs!) {
+        final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data['sender_Id'] != null) {
+          String senderId = data['sender_Id'];
+          if (!mapUserName.containsKey(senderId)) {
+            User? senderUser = await UserFirestore.fetchProfile(senderId);
+            mapUserName[senderId] = senderUser!.name;
+          }
+          if (!whoList.contains(data['who'])) {
+            whoList.add(data['who']);
+            setState(() {});
+          }
+        }
+      }
+      setState(() {});
     });
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.lightBlueAccent,
       appBar: AppBar(
@@ -49,7 +74,29 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
         )),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () async {
+              setState(() {
+                isOpenKeyboard = false;
+              });
+              List<String>? newMemberList = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return EditGroupPage(
+                        groupId: widget.talkRoom.roomId,
+                        groupName: widget.talkRoom.groupName,
+                        password: widget.talkRoom.password,
+                        memberList: _members,
+                        isExistMessage: calculationDocs != null,
+                        whoList: whoList);
+                  },
+                ),
+              );
+              if (newMemberList != null) {
+                _members = newMemberList;
+                isSelectedPerson = _members!.first;
+                setState(() {});
+              }
+            },
             icon: Icon(Icons.settings),
           ),
           IconButton(
@@ -58,7 +105,7 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                 // 精算ロジック
                 if (calculationDocs != null) {
                   List<Map<String, double>> output = [];
-                  List<String> members = widget.talkRoom.members;
+                  List<String> members = _members!;
                   for (var member in members) {
                     Map<String, double> map = {};
                     for (String other in members) {
@@ -71,10 +118,16 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                   for (var doc in calculationDocs!) {
                     final Map<String, dynamic> data =
                         doc.data() as Map<String, dynamic>;
+                    if (data['who'] == null) continue;
                     String who = data['who'];
                     int money = data['how_much'];
-                    List targets =
+                    List<String> targets =
                         data['targets'].cast<String>() as List<String>;
+                    for (int i = 0; i < targets.length; i++) {
+                      if (!members.contains(targets[i])) {
+                        targets.remove(targets[i]);
+                      }
+                    }
                     double split = money / targets.length;
                     for (String target in targets) {
                       if (target != who) {
@@ -166,68 +219,73 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                                           shrinkWrap: true,
                                           physics:
                                               const NeverScrollableScrollPhysics(),
-                                          itemCount:
-                                              widget.talkRoom.members.length,
+                                          itemCount: _members!.length,
                                           itemBuilder: (BuildContext context,
                                               int index) {
+                                            double allMoney = 0;
                                             return Column(
                                               children: [
-                                                Text(
-                                                    widget.talkRoom
-                                                        .members[index],
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 30)),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      left:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width *
-                                                              0.1),
-                                                  child: ListView.builder(
-                                                      shrinkWrap: true,
-                                                      physics:
-                                                          const NeverScrollableScrollPhysics(),
-                                                      itemCount: widget.talkRoom
-                                                              .members.length +
-                                                          1,
-                                                      itemBuilder:
-                                                          (BuildContext context,
-                                                              int i) {
-                                                        double allMoney = 0;
-                                                        if (index != i) {
-                                                          if (i !=
-                                                              widget
-                                                                  .talkRoom
-                                                                  .members
-                                                                  .length) {
-                                                            allMoney += warikan[
-                                                                    index][
-                                                                widget.talkRoom
-                                                                        .members[
-                                                                    i]]!;
-                                                            return Text(
-                                                                '${widget.talkRoom.members[i]}に、¥${warikan[index][widget.talkRoom.members[i]]}円払う',
-                                                                style:
-                                                                    const TextStyle(
-                                                                        fontSize:
-                                                                            20));
+                                                Container(
+                                                  child: Text(_members![index],
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 30)),
+                                                ),
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.purple[50],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.1),
+                                                    child: ListView.builder(
+                                                        shrinkWrap: true,
+                                                        physics:
+                                                            const NeverScrollableScrollPhysics(),
+                                                        itemCount:
+                                                            _members!.length +
+                                                                1,
+                                                        itemBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                int i) {
+                                                          if (index != i) {
+                                                            if (i !=
+                                                                _members!
+                                                                    .length) {
+                                                              allMoney +=
+                                                                  warikan[index]
+                                                                      [
+                                                                      _members![
+                                                                          i]]!;
+                                                              return Text(
+                                                                  '${_members![i]}に、¥${warikan[index][_members![i]]}円払う',
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          20));
+                                                            } else {
+                                                              return Text(
+                                                                  '合計、¥$allMoney円の支払い',
+                                                                  style: const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
+                                                                      fontSize:
+                                                                          20));
+                                                            }
                                                           } else {
-                                                            return Text(
-                                                                '合計、¥$allMoney円の支払い',
-                                                                style: const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    fontSize:
-                                                                        20));
+                                                            return Container();
                                                           }
-                                                        } else {
-                                                          return Container();
-                                                        }
-                                                      }),
+                                                        }),
+                                                  ),
                                                 )
                                               ],
                                             );
@@ -267,42 +325,180 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                           final doc = snapshot.data!.docs[index];
                           final Map<String, dynamic> data =
                               doc.data() as Map<String, dynamic>;
-                          final Message message = Message(
-                              message:
-                                  '${data['who']}が、${data['where']}で${data['how_much']}円払った',
-                              isMe: SharedPrefs.fetchUid() == data['sender_Id'],
-                              sendTime: data['send_time']);
-                          return Padding(
-                            padding: EdgeInsets.only(
-                                top: 10.0,
-                                left: 10,
-                                right: 10,
-                                bottom: index == 0 ? 10 : 0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              textDirection: message.isMe
-                                  ? TextDirection.rtl
-                                  : TextDirection.ltr,
-                              children: [
-                                Container(
-                                    constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width *
-                                                0.6),
-                                    decoration: BoxDecoration(
-                                      color: message.isMe
-                                          ? Colors.green
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 6),
-                                    child: Text(message.message)),
-                                Text(intl.DateFormat('y:HH:mm')
-                                    .format(message.sendTime.toDate()))
-                              ],
-                            ),
-                          );
+                          late Message message;
+                          if (data['notice'] == null) {
+                            message = Message(
+                                message:
+                                    '${data['who']}が、${data['where']}で${data['how_much']}円払った',
+                                isMe:
+                                    SharedPrefs.fetchUid() == data['sender_Id'],
+                                sendTime: data['send_time']);
+                          } else {
+                            message = Message(
+                                message: data['notice'],
+                                isMe: null,
+                                sendTime: data['send_time']);
+                          }
+                          return data['notice'] != null
+                              ? Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 10.0,
+                                      bottom: 10,
+                                      left: size.width * 0.25,
+                                      right: size.width * 0.25),
+                                  child: Container(
+                                      constraints: BoxConstraints(
+                                          maxWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.3),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      child: Center(
+                                        child: Text(
+                                            '${intl.DateFormat('y:HH:mm').format(message.sendTime.toDate())}\n${message.message}',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11)),
+                                      )),
+                                )
+                              : Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 10.0,
+                                      left: message.isMe! ? 10 : 0,
+                                      right: 10,
+                                      bottom: index == 0 ? 10 : 0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    textDirection: message.isMe!
+                                        ? TextDirection.rtl
+                                        : TextDirection.ltr,
+                                    children: [
+                                      if (!message.isMe!)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 6.0, right: 6.0),
+                                          child: CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                iconImages[
+                                                    widget.talkRoom.joinedUsers[
+                                                        data['sender_Id']]!]),
+                                            radius: 20,
+                                          ),
+                                        ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (!message.isMe!)
+                                            Text(mapUserName[
+                                                    data['sender_Id']] ??
+                                                ''),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            textDirection: message.isMe!
+                                                ? TextDirection.rtl
+                                                : TextDirection.ltr,
+                                            children: [
+                                              GestureDetector(
+                                                onTapUp: (details) {
+                                                  final position =
+                                                      details.globalPosition;
+                                                  showMenu(
+                                                    context: context,
+                                                    position:
+                                                        RelativeRect.fromLTRB(
+                                                            position.dx,
+                                                            position.dy,
+                                                            position.dx,
+                                                            position.dy),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10.0),
+                                                    ),
+                                                    items: [
+                                                      const PopupMenuItem(
+                                                        value: 1,
+                                                        child: Text(
+                                                          '削除',
+                                                        ),
+                                                      ),
+                                                    ],
+                                                    elevation: 8.0,
+                                                  ).then((value) async {
+                                                    switch (value) {
+                                                      case 1:
+                                                        // 削除処理
+                                                        await RoomFirestore
+                                                            .deleteMessage(
+                                                                roomId: widget
+                                                                    .talkRoom
+                                                                    .roomId,
+                                                                id: doc.id);
+                                                        whoList = [];
+                                                        setState(() {});
+                                                        break;
+                                                      default:
+                                                        break;
+                                                    }
+                                                  });
+                                                },
+                                                child: Container(
+                                                    constraints: BoxConstraints(
+                                                        maxWidth: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.6),
+                                                    decoration: BoxDecoration(
+                                                      color: message.isMe!
+                                                          ? Colors.green
+                                                          : Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                    ),
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 6),
+                                                    child:
+                                                        Text(message.message)),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    bottom: 5.0,
+                                                    right: message.isMe!
+                                                        ? 5.0
+                                                        : 0.0,
+                                                    left: message.isMe!
+                                                        ? 0
+                                                        : 5.0),
+                                                child: Text(
+                                                    intl.DateFormat('y:HH:mm')
+                                                        .format(message.sendTime
+                                                            .toDate()),
+                                                    style: const TextStyle(
+                                                        color: Colors.black54,
+                                                        fontSize: 10)),
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
                         }),
                   );
                 } else {
@@ -367,18 +563,17 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                                 child: DropdownButton(
                                   items: [
                                     for (int index = 0;
-                                        index < widget.talkRoom.members.length;
+                                        index < _members!.length;
                                         index++)
                                       DropdownMenuItem(
-                                        value: widget.talkRoom.members[index],
+                                        value: _members![index],
                                         child: Container(
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
                                               0.65,
                                           alignment: Alignment.center,
-                                          child: Text(
-                                              widget.talkRoom.members[index]),
+                                          child: Text(_members![index]),
                                         ),
                                       ),
                                   ],
@@ -396,8 +591,7 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                                 onPressed: () {
                                   setState(() {
                                     isOpenKeyboard = false;
-                                    isSelectedPerson =
-                                        widget.talkRoom.members.first;
+                                    isSelectedPerson = _members!.first;
                                     whereController.text = '';
                                     moneyController.text = '';
                                   });
@@ -459,12 +653,11 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                                         where: whereController.text,
                                         howMuch:
                                             int.parse(moneyController.text),
-                                        targets: widget.talkRoom.members,
+                                        targets: _members!,
                                         roomId: widget.talkRoom.roomId);
                                     setState(() {
                                       isOpenKeyboard = false;
-                                      isSelectedPerson =
-                                          widget.talkRoom.members.first;
+                                      isSelectedPerson = _members!.first;
                                       whereController.text = '';
                                       moneyController.text = '';
                                     });

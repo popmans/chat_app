@@ -1,7 +1,7 @@
 class TalkRoom {
   String roomId;
   // joinedUsersでは、uid, userName, image_pathを管理します
-  List<Map<String, String>> joinedUsers;
+  Map<String, int> joinedUsers;
   List<String> members;
   String groupName;
   int password;
