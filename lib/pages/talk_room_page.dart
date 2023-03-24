@@ -552,7 +552,7 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                   children: [
                     Container(
                       color: Colors.white,
-                      height: 195,
+                      height: 220,
                       child: Column(
                         children: [
                           Row(
@@ -611,6 +611,7 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TextField(
+                                    maxLength: 20,
                                     controller: whereController,
                                     focusNode: focusNode,
                                     decoration: const InputDecoration(
@@ -631,10 +632,12 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TextField(
+                                    maxLength: 8,
                                     controller: moneyController,
                                     keyboardType: TextInputType.number,
                                     inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly
+                                      FilteringTextInputFormatter.deny(
+                                          RegExp(r'^0+'))
                                     ],
                                     decoration: const InputDecoration(
                                         hintText: '金額',

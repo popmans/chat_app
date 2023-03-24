@@ -112,6 +112,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
                 child: SizedBox(
                   width: size.width * 0.9,
                   child: TextFormField(
+                    maxLength: 15,
                     controller: groupNameController,
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
@@ -149,6 +150,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
                   SizedBox(
                     width: size.width * 0.7,
                     child: TextFormField(
+                      maxLength: 10,
                       controller: memberNameController,
                       decoration: InputDecoration(
                         focusedBorder: OutlineInputBorder(

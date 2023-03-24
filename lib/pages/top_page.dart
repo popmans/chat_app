@@ -1,7 +1,6 @@
 import 'package:chat_app/firestore/room_firestore.dart';
 import 'package:chat_app/firestore/user_firestore.dart';
 import 'package:chat_app/pages/edit_group_page.dart';
-import 'package:chat_app/pages/setting_profile_page.dart';
 import 'package:chat_app/pages/talk_room_page.dart';
 import 'package:chat_app/utils/shared_prefs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -74,16 +73,6 @@ class _TopPageState extends State<TopPage> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('チャットアプリ'),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SettingProfilePage()));
-                },
-                icon: const Icon(Icons.settings)),
-          ],
         ),
         body: StreamBuilder<QuerySnapshot>(
             stream: RoomFirestore.joinedRoomSnapshot,
@@ -224,7 +213,7 @@ class _TopPageState extends State<TopPage> {
                                                               groupNameController,
                                                           enabled: true,
                                                           // 入力数
-                                                          maxLength: 10,
+                                                          maxLength: 15,
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.black),
