@@ -65,7 +65,7 @@ class _TalkRoomPageState extends State<TalkRoomPage> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.lightBlueAccent,
+      backgroundColor: Colors.purple[50],
       appBar: AppBar(
         title: Center(
             child: Padding(

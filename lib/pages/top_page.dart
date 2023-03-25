@@ -40,8 +40,8 @@ class _TopPageState extends State<TopPage> {
                 obscureText: false,
                 maxLines: 1,
                 decoration: const InputDecoration(
-                  hintText: 'グループ名を入力してください',
-                  labelText: 'グループ名',
+                  hintText: 'ユーザー名を入力してください',
+                  labelText: 'ユーザー名',
                 ),
               ),
               actions: [
@@ -115,12 +115,15 @@ class _TopPageState extends State<TopPage> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(
-                                                  talkRooms[index].groupName,
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold),
+                                                Container(
+                                                  color: Colors.purple[50],
+                                                  child: Text(
+                                                    talkRooms[index].groupName,
+                                                    style: const TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
                                                 ),
                                               ],
                                             ),
