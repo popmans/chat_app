@@ -1,5 +1,6 @@
 import 'package:chat_app/firestore/room_firestore.dart';
 import 'package:chat_app/firestore/user_firestore.dart';
+import 'package:chat_app/pages/drawer_page.dart';
 import 'package:chat_app/pages/edit_group_page.dart';
 import 'package:chat_app/pages/talk_room_page.dart';
 import 'package:chat_app/utils/shared_prefs.dart';
@@ -16,12 +17,13 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!SharedPrefs.fetchDoneOpen()) {
-        print('pass3');
         await showDialog(
           context: context,
           barrierDismissible: false,
@@ -72,9 +74,18 @@ class _TopPageState extends State<TopPage> {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: const Text('チャットアプリ'),
+          actions: [
+            IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white, size: 25),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openEndDrawer();
+                }),
+          ],
         ),
+        endDrawer: const DefaultDrawer(),
         body: StreamBuilder<QuerySnapshot>(
             stream: RoomFirestore.joinedRoomSnapshot,
             builder: (context, streamSnapshot) {
