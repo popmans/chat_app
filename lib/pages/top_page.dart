@@ -9,20 +9,31 @@ import 'package:flutter/material.dart';
 
 import '../model/talk_room.dart';
 
+// 1. StatefulWidgetを継承したクラスを作る。
 class TopPage extends StatefulWidget {
   const TopPage({Key? key}) : super(key: key);
 
   @override
   State<TopPage> createState() => _TopPageState();
 }
+// createState()　で"(_TopPage)State"（Stateを継承したクラス）を返す
 
+// 2. StateをExtendsしたクラスを作る（上記のcreateState()で返されるクラス）
 class _TopPageState extends State<TopPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-
+//ScaffoldStateのGlobalKeyを変数として定義していきます。
   @override
-  void initState() {
+  void initState()
+  //initState()メソッドは、ウィジェットが初期化された後に、必要なデータを取得したり、ウィジェットの初期状態を設定したり、アニメーションを開始したりするために使用できます。また、ウィジェットがアクティブな状態になったときに実行する必要があるコードを初期化するためにも使用できます。
+  // つまり、initState()はウィジェットの初期化を行うための重要なメソッドであり、ウィジェットの初期状態を設定し、必要なデータを取得し、アニメーションを開始するために使用されます。
+  //https://res.cloudinary.com/zenn/image/fetch/s---1SMIXNO--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_1200/https://storage.googleapis.com/zenn-user-upload/deployed-images/8b6dca88cb9eee42bc1b9b05.png%3Fsha%3D06edf91efbc76778b375d4f00f71c460631c7981
+  {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback
+        //ウィジェットが作られた後に、アニメーションを始めたい場合や、データを取得したい場合があります。そんな時に、WidgetsBinding.instance.addPostFrameCallback((_) async { というコードを使います。
+        // これは、ウィジェット(build)が作られた後に、ちょうどいいタイミングでコードを実行するための方法です。その中に、アニメーションの開始やデータの取得など、必要な処理を書きます。
+        // 簡単に言うと、ウィジェットが作られた後に必要な処理をするためのコードを書く場所を用意してくれる、便利な機能なんです。
+        ((_) async {
       if (!SharedPrefs.fetchDoneOpen()) {
         await showDialog(
           context: context,
