@@ -33,12 +33,28 @@ class _TopPageState extends State<TopPage> {
         //ウィジェットが作られた後に、アニメーションを始めたい場合や、データを取得したい場合があります。そんな時に、WidgetsBinding.instance.addPostFrameCallback((_) async { というコードを使います。
         // これは、ウィジェット(build)が作られた後に、ちょうどいいタイミングでコードを実行するための方法です。その中に、アニメーションの開始やデータの取得など、必要な処理を書きます。
         // 簡単に言うと、ウィジェットが作られた後に必要な処理をするためのコードを書く場所を用意してくれる、便利な機能なんです。
-        ((_) async {
-      if (!SharedPrefs.fetchDoneOpen()) {
-        await showDialog(
+        ((_) async
+            //asyncキーワードは、そのコードがウィジェットの初期化が完了した後に、非同期的に実行されることを示しています。
+            //、asyncメソッド内では、awaitキーワードを使用して、非同期的に処理を待つことができます。
+            {
+      if (!SharedPrefs.fetchDoneOpen())
+      //SharedPrefsというFlutterアプリ内でローカルストレージにデータを保存するためのパッケージを使用しています。
+      //まだアプリが初回起動である場合を示しています
+      //SharedPrefs.fetchDoneOpen()がtrueを返す場合、そのキーに対応するデータが既に存在しているため、アプリは既に初回起動済みであることを示します。
+      //
+      // このような初回起動判定は、アプリで初期設定を行う場合や、初回起動時にチュートリアルを表示する場合などに利用されます。
+      {
+        await showDialog
+            //FlutterのshowDialog()は、ダイアログを表示するための便利なウィジェットです。アプリのユーザーに対してメッセージを表示したり、入力を促したりすることができます。
+            //また、AlertDialogは、通常OKまたはキャンセルのボタンを備えた簡単なメッセージボックスを表示するために使用されます。SimpleDialogは、より多くのオプションや選択肢を提供するために使用されます。ダイアログ内に表示するウィジェットを自由にカスタマイズすることもできます。
+            (
           context: context,
+          //「context: context」というのは、Flutterのウィジェットが現在実行されている位置を示すもので、ウィジェットがどのような環境で実行されているかによって、アプリの動作が変わることがあるため、Flutter開発において重要な要素です。
           barrierDismissible: false,
-          builder: (_) {
+          //通常、Flutterのダイアログは、ダイアログ以外の領域をタップすると自動的に閉じられます。しかし、barrierDismissible: falseと設定することで、ユーザーがダイアログ以外の領域をタップしてもダイアログが閉じられないようにすることができます。
+          builder: (_)
+              //
+              {
             TextEditingController userNameController = TextEditingController();
             return AlertDialog(
               shape: const RoundedRectangleBorder(
