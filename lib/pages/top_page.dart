@@ -53,10 +53,13 @@ class _TopPageState extends State<TopPage> {
           barrierDismissible: false,
           //通常、Flutterのダイアログは、ダイアログ以外の領域をタップすると自動的に閉じられます。しかし、barrierDismissible: falseと設定することで、ユーザーがダイアログ以外の領域をタップしてもダイアログが閉じられないようにすることができます。
           builder: (_)
-              //
+              //Flutterにおける"builder"は、ウィジェットの構築とレイアウトを行うためのメソッドの一つです。具体的には、StatefulWidgetクラス内で定義され、ウィジェットの状態が変化したときに再構築される際に呼び出されます。
               {
             TextEditingController userNameController = TextEditingController();
-            return AlertDialog(
+            //「TextEditingController userNameController = TextEditingController();」というコードは、この「TextEditingController」クラスのインスタンスを作成しています。また、このコントローラーは、テキストフィールドなどのウィジェットと紐づけることができ、ウィジェットでユーザーが入力したテキストを管理することができます。
+            return AlertDialog
+                //「AlertDialog」とは、Flutterでダイアログを表示するためのウィジェットの一つです。ダイアログとは、ユーザーにメッセージや確認を求めるために、一時的に画面を中断して表示されるポップアップウィンドウのことを指します。
+                (
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0))),
               title: Text("ユーザー名を入力してください"),
