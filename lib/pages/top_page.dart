@@ -62,8 +62,15 @@ class _TopPageState extends State<TopPage> {
                 (
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              //shapeプロパティは、ボタンやカードなどのウィジェットの形状を決定するために使用されます。
+              //shapeプロパティにRoundedRectangleBorderを指定しているため、ウィジェットの形状が丸みを帯びた四角形になります。
+              //borderRadiusプロパティは、ウィジェットの角の半径を指定するために使用されます。このプロパティは、RoundedRectangleBorderなどの角の丸みを設定するためによく使用されます。上記のコードでは、borderRadiusプロパティにBorderRadius.all(Radius.circular(10.0))を指定しているため、ウィジェットの角が半径10.0の円弧になります。
+
               title: Text("ユーザー名を入力してください"),
-              content: TextField(
+              content: TextField
+                  //contentはプロパティを使用して、ユーザーが入力するためのテキストフィールドを作成しています。
+                  //TextFieldウィジェットを使用して作成されており、controllerプロパティを使用して、テキストフィールドの値を管理するためのコントローラを指定しています。
+                  (
                 controller: userNameController,
                 enabled: true,
                 // 入力数
@@ -76,21 +83,33 @@ class _TopPageState extends State<TopPage> {
                   labelText: 'ユーザー名',
                 ),
               ),
-              actions: [
+              actions:
+                  //actionsプロパティを使用して、ダイアログの下部にボタンを追加しています
+                  [
                 OutlinedButton(
                   child: Text("決定"),
                   onPressed: () async {
                     if (userNameController.text != '') {
                       String? uid = SharedPrefs.fetchUid();
+                      //アカウントが元々存在した場合のコード処理
+                      //userNameController.textは、ユーザーが入力したユーザー名を含むテキストフィールドのコントローラです。条件式 userNameController.text != '' は、ユーザー名のテキストフィールドが空でない場合に真を返します。
+                      //String? uid = SharedPrefs.fetchUid();は、Shared PreferencesからUIDを取得し、変数uidに割り当てるコードです。
+                      //Shared Preferencesは、アプリケーションのデータを簡単に保存するためのフレームワークであり、永続的な設定、ユーザー名、およびその他のデータを保存できます。
+                      // SharedPrefs.fetchUid()は、Shared PreferencesからUIDを取得するためのメソッドです。戻り値がString?となっているのは、UIDが存在しない場合にnullを返すためです。したがって、この条件文では、ユーザー名のテキストフィールドが空でなく、UIDがnullでない場合に、UserFirestore.updateUserName()メソッドを呼び出すことができます。このメソッドは、ユーザー名をFirestoreに保存するために使用されます。
                       if (uid != null) {
                         await UserFirestore.updateUserName(
                             uid, userNameController.text);
                       }
+                      //このコードは、uidがnullでない場合に、ユーザー名をFirestoreに保存するためにUserFirestore.updateUserName()メソッドを呼び出します。
+                      //UserFirestore.updateUserName()メソッドは、Firestoreのデータベース内のユーザードキュメントのusernameフィールドを更新するために使用されます。
                       SharedPrefs.setDoneOpen();
                       Navigator.pop(context);
+                      //SharedPrefs.setDoneOpen();が実行されます。このメソッドは、アプリの状態を変更し、ユーザーにアプリが起動されたことを通知します。
+                      // 最後に、Navigator.pop(context);が呼び出され、ダイアログが閉じられます。
                     }
                   },
                 ),
+                //OutlinedButtonウィジェットを使用して、"決定"というテキストを持つボタンを作成しています。ボタンがクリックされた場合、テキストフィールドの値が空でない場合に、UserFirestore.updateUserNameメソッドを呼び出して、ユーザー名をアップデートし、ダイアログを閉じるようになっています。
               ],
             );
           },
